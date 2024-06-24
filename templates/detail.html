@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+
+    <title>Detail Buku</title>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="mb-4">Detail Buku</h1>
+        
+        <table class="table table-bordered">
+            <tbody>
+                <tr>
+                    <th>ID</th>
+                    <td>{{ book['id'] }}</td>
+                </tr>
+                <tr>
+                    <th>Judul</th>
+                    <td>{{ book['title'] }}</td>
+                </tr>
+                <tr>
+                    <th>Penulis</th>
+                    <td>{{ book['author'] }}</td>
+                </tr>
+                <tr>
+                    <th>Tahun Terbit</th>
+                    <td>{{ book['publication_year'] }}</td>
+                </tr>
+                <tr>
+                    <th>Deskripsi</th>
+                    <td>{{ book['description'] }}</td>
+                </tr>
+                <tr>
+                    <th>Harga</th>
+                    <td>{{ book['prices'] }}</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <a href="/" class="btn btn-secondary">Kembali ke Daftar Buku</a>
+    </div>
+
+    <!-- Bootstrap JS and dependencies (optional for some components) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js" integrity="sha384-TvcAq1rznW9IFB9pcnKs/5GndtiJzxhsg6Ebrv7Q1GS5AdFpI+24KV3nOmL7NQRf" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8sh+Fa0dVyJVVdIcbwfoRS0r4xQY5Fkwg6B1Sk" crossorigin="anonymous"></script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!-- templates/search_results.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hasil Pencarian</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+</head>
+<body>
+    <!-- Include header -->
+    {% include 'header.html' %}
+
+    <div class="container mt-4">
+        <h1 class="mb-4">Daftar Buku</h1>
+        
+        <!-- Form pencarian -->
+        <form action="/search" method="GET" class="mb-4">
+            <div class="input-group">
+                <input type="text" class="form-control" name="query" placeholder="Cari berdasarkan judul atau penulis">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-primary" type="submit">Cari lagi</button>
+                </div>
+            </div>
+        </form>        
+        <h4 class="mb-4">Hasil Pencarian terkait "{{ query }}"</h4>
+        
+        <!-- Tampilkan hasil pencarian -->
+        {% if books %}
+            <div class="row">
+                {% for book in books %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ book['title'] }}</h5>
+                            <p class="card-text">Penulis: {{ book['author'] }}</p>
+                            <p class="card-text">Harga: {{ book['prices'] }}</p>
+                            <a href="/detail/{{ book['id'] }}" class="btn btn-primary">Detail</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>Tidak ada hasil untuk pencarian ini.</p>
+        {% endif %}
+    </div>
+
+    <!-- Bootstrap JS and dependencies (optional for some components) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js" integrity="sha384-TvcAq1rznW9IFB9pcnKs/5GndtiJzxhsg6Ebrv7Q1GS5AdFpI+24KV3nOmL7NQRf" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8sh+Fa0dVyJVVdIcbwfoRS0r4xQY5Fkwg6B1Sk" crossorigin="anonymous"></script>
+
+    <!-- Include footer -->
+    {% include 'footer.html' %}
+</body>
+</html>
