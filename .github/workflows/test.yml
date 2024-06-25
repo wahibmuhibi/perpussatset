@@ -94,7 +94,7 @@ jobs:
       run: sleep 60
 
     - name: Run ZAP baseline scan
-      run: docker run -v $(pwd):/zap/wrk/ -i zaproxy/zap-stable zap-baseline.py -t http://13.239.137.109:5000 -g gen.conf -r /zap/wrk/zap_report.html
+      run: docker run -v $(pwd):/zap/wrk/ -e HOST_UID=$(id -u) -e HOST_GID=$(id -g) -i zaproxy/zap-stable zap-baseline.py -t http://13.239.137.109:5000 -g /zap/wrk/gen.conf -r /zap/wrk/zap_report.html
 
     - name: Upload ZAP report
       uses: actions/upload-artifact@v2
