@@ -88,13 +88,13 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Start ZAP
-      run: docker run -u zap -d -p 8080:8080 -i owasp/zap2docker-stable:latest zap.sh -daemon -port 8080 -host 0.0.0.0 -config api.disablekey=true
+      run: docker run -u zap -d -p 8080:8080 -i zaproxy/zap-stable zap.sh -daemon -port 8080 -host 0.0.0.0 -config api.disablekey=true
 
     - name: Wait for ZAP to start
       run: sleep 60
 
     - name: Run ZAP baseline scan
-      run: docker run -i owasp/zap2docker-stable:latest zap-baseline.py -t http://13.239.137.109:5000 -g gen.conf -r zap_report.html
+      run: docker run -i zaproxy/zap-stable zap-baseline.py -t http://13.239.137.109:5000 -g gen.conf -r zap_report.html
 
     - name: Upload ZAP report
       uses: actions/upload-artifact@v2
