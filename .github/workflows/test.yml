@@ -75,5 +75,9 @@ jobs:
             # Stop and remove any existing container
             docker stop webapp || true
             docker rm webapp || true
-            sudo docker pull wahibmuhibi/webapp:${{ steps.get_image_digest.outputs.digest }}
-            sudo docker run -d -p 80:5000 --name webapp wahibmuhibi/webapp:${{ steps.get_image_digest.outputs.digest }}
+      
+            # Pull the latest Docker image
+            sudo docker pull wahibmuhibi/webapp:${{ github.sha }}
+      
+            # Run the Docker container
+            sudo docker run -d -p 80:5000 --name webapp wahibmuhibi/webapp:${{ github.sha }}
