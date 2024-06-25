@@ -72,6 +72,12 @@ jobs:
           ls
           docker stop webapp || true
           docker rm webapp || true
+          
+          CONTAINER=$(docker ps -a -q --filter ancestor=ec2-flask:v1.0)
+          if [ -n "$CONTAINER" ]; then
+          docker rm -f $CONTAINER
+          fi
+          
           docker rmi ec2-flask:v1.0 || true
 
           # Build the Docker image on the EC2 instance
