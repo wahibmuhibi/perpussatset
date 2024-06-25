@@ -53,36 +53,19 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Pull Dockerfile and Docker image from Docker Hub
+    - name: Get latest Docker image tag
+      id: get-latest-tag
       run: |
-        mkdir -p /home/ec2-user/downloads
-        cd /home/ec2-user/downloads
-        docker pull wahibmuhibi/webapp:${{ github.sha }}
-        docker save wahibmuhibi/webapp:${{ github.sha }} > image.tar
-        docker pull wahibmuhibi/webapp:latest
-        docker save wahibmuhibi/webapp:latest > image-latest.tar
-        docker pull wahibmuhibi/webapp:v1.0
-        docker save wahibmuhibi/webapp:v1.0 > image-v1.0.tar
-        tar -xf image.tar -C /home/ec2-user/downloads
-        tar -xf image-latest.tar -C /home/ec2-user/downloads
-        tar -xf image-v1.0.tar -C /home/ec2-user/downloads
+        echo ::set-output name=TAG::$(docker pull -q wahibmuhibi/webapp | awk '{ print $3 }')
 
-    - name: Connect to EC2 and deploy
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USERNAME }}
-        key: ${{ secrets.EC2_PRIVATE_KEY }}
-        script: |
-          cd /home/ec2-user/downloads
+    - name: Stop and remove existing container
+      run: |
+        docker stop webapp || true
+        docker rm webapp || true
 
-          # Stop and remove any existing container
-          docker stop webapp || true
-          docker rm webapp || true
-
-          # Run the Docker image
-          docker load -i image-v1.0.tar
-          sudo docker run -d -p 80:5000 --name webapp wahibmuhibi/webapp:v1.0
+    - name: Run Docker container with dynamic tag
+      run: |
+        docker run -d -p 80:5000 --name webapp wahibmuhibi/webapp:${{ steps.get-latest-tag.outputs.TAG }}
 
   security-scan:
     runs-on: ubuntu-latest
