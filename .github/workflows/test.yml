@@ -67,17 +67,18 @@ jobs:
         username: ${{ secrets.EC2_USERNAME }}
         key: ${{ secrets.EC2_PRIVATE_KEY }}
         script: |
-          # Stop and remove any existing container
+          # Stop and remove any existing container and image
           pwd
           ls
           docker stop webapp || true
           docker rm webapp || true
+          docker rmi ec2-flask:v1.0 || true
 
           # Build the Docker image on the EC2 instance
           sudo docker build -t ec2-flask:v1.0 -f Dockerfile .
 
           # Run the newly built Docker image
-          sudo docker run -d -p 80:5000 --name webapp ec2-flask:v1.0 -u
+          sudo docker run -d -p 80:5000 --name webapp ec2-flask:v1.0
 
   security-scan:
     runs-on: ubuntu-latest
@@ -94,7 +95,7 @@ jobs:
       run: sleep 60
 
     - name: Run ZAP baseline scan
-      run: docker run -v $(pwd):/zap/wrk/ -u $(id -u):$(id -g) -i zaproxy/zap-stable zap-baseline.py -t http://13.239.137.109:5000 -g /zap/wrk/gen.conf -r /zap/wrk/zap_report.html
+      run: docker run -v $(pwd):/zap/wrk/ -e HOST_UID=$(id -u) -e HOST_GID=$(id -g) -i zaproxy/zap-stable zap-baseline.py -t http://13.239.137.109:5000 -g /zap/wrk/gen.conf -r /zap/wrk/zap_report.html
 
     - name: Upload ZAP report
       uses: actions/upload-artifact@v2
