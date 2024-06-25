@@ -73,16 +73,19 @@ jobs:
           docker stop webapp || true
           docker rm webapp || true
           
-          CONTAINER=$(docker ps -a -q --filter ancestor=ec2-flask:v1.0)
+          # Hapus semua container yang menggunakan image ec2-flask:v1.0
+          CONTAINER=$(sudo docker ps -a -q --filter ancestor=ec2-flask:v1.0)
           if [ -n "$CONTAINER" ]; then
-          docker rm -f $CONTAINER
+              sudo docker rm -f $CONTAINER
           fi
           
-          docker rmi ec2-flask:v1.0 || true
-
+          # Hapus image ec2-flask:v1.0
+          sudo docker rmi ec2-flask:v1.0 || true
+          
+          # Pastikan Dockerfile ada di direktori yang benar (misalnya /home/user/proyek/)
           # Build the Docker image on the EC2 instance
-          sudo docker build -t ec2-flask:v1.0 -f Dockerfile .
-
+          sudo docker build -t ec2-flask:v1.0 -f /home/user/proyek/Dockerfile /home/user/proyek
+          
           # Run the newly built Docker image
           sudo docker run -d -p 80:5000 --name webapp ec2-flask:v1.0
 
