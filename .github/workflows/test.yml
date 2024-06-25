@@ -67,24 +67,15 @@ jobs:
         username: ${{ secrets.EC2_USERNAME }}
         key: ${{ secrets.EC2_PRIVATE_KEY }}
         script: |
-          # Stop and remove any existing container and image
+          # Stop and remove any existing container
           pwd
           ls
           docker stop webapp || true
           docker rm webapp || true
-          
-          # Hapus semua container yang menggunakan image ec2-flask:v1.0
-          CONTAINER=$(sudo docker ps -a -q --filter ancestor=ec2-flask:v1.0)
-          if [ -n "$CONTAINER" ]; then
-              sudo docker rm -f $CONTAINER
-          fi
-          
-          # Hapus image ec2-flask:v1.0
-          sudo docker rmi ec2-flask:v1.0 || true
-          
+
           # Build the Docker image on the EC2 instance
-          sudo docker build -t ec2-flask:v1.0 -f
-          
+          sudo docker build -t ec2-flask:v1.0 -f Dockerfile .
+
           # Run the newly built Docker image
           sudo docker run -d -p 80:5000 --name webapp ec2-flask:v1.0
 
