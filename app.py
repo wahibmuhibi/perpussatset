@@ -15,6 +15,40 @@ def get_books(page, per_page):
     end = start + per_page
     return df.iloc[start:end]
 
+# Fungsi untuk menghitung jumlah buku
+def count_books():
+    return df.shape[0]
+
+# Fungsi untuk mendapatkan variasi harga dari prices
+def get_price_variety():
+    prices = df['prices'].dropna().tolist()
+    price_count = {
+        '0-20000': 0,
+        '20001-40000': 0,
+        '40001-60000': 0,
+        '60001-80000': 0,
+        '80001-100000': 0,
+        'Above 100000': 0  # Kategori baru untuk harga di atas 100000
+    }
+    
+    for price_list in prices:
+        for price_dict in eval(price_list):
+            price = price_dict['price']
+            if price <= 20000:
+                price_count['0-20000'] += 1
+            elif price <= 40000:
+                price_count['20001-40000'] += 1
+            elif price <= 60000:
+                price_count['40001-60000'] += 1
+            elif price <= 80000:
+                price_count['60001-80000'] += 1
+            elif price <= 100000:
+                price_count['80001-100000'] += 1
+            else:
+                price_count['Above 100000'] += 1
+    
+    return price_count
+
 # Route untuk halaman utama dengan pagination
 @app.route('/')
 def index():
@@ -43,6 +77,13 @@ def search():
     else:
         results = df
     return render_template('search_results.html', books=results.to_dict(orient='records'), query=query)
+
+# Route untuk halaman dashboard
+@app.route('/dashboard')
+def dashboard():
+    total_books = count_books()
+    price_variety = get_price_variety()
+    return render_template('dashboard.html', total_books=total_books, price_variety_json=price_variety)
 
 if __name__ == '__main__':
     app.run(debug=True)
