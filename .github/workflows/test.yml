@@ -135,8 +135,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         with:
-          tag_name: ${{ github.sha }}
-          release_name: Release ${{ github.sha }}
+          tag_name: v1.0.0  # Ganti dengan tag yang sudah ada dan valid di repositori
+          release_name: Release v1.0.0  # Nama rilis yang diinginkan
           draft: false
           prerelease: false
 
