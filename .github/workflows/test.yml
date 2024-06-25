@@ -29,9 +29,7 @@ jobs:
 
       - name: Lint with flake8
         run: |
-          # stop the build if there are Python syntax errors or undefined names
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
       - name: Test with pytest
@@ -39,7 +37,7 @@ jobs:
           pytest
 
   deploy:
-    needs: build-test 
+    needs: build-test
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
 
@@ -47,11 +45,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Install Docker CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+          sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+          sudo apt-get update
+          sudo apt-get install -y docker-ce
 
       - name: Build and Push Docker image
         id: docker_build
@@ -65,17 +66,30 @@ jobs:
         id: get_image_digest
         run: echo "::set-output name=digest::$(docker inspect --format='{{index .RepoDigests 0}}' ${{ steps.docker_build.outputs.image }})"
 
-      - name: Connect to EC2 and deploy
+      - name: Copy files to EC2 instance
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          port: 22
+          source: "."
+          target: "/home/ec2-user/downloads"
+          recursive: true
+
+      - name: SSH into EC2 and deploy
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
+          username: ec2-user
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
             # Stop and remove any existing container
             docker stop webapp || true
             docker rm webapp || true
 
-            sudo docker pull "${{ steps.get_image_digest.outputs.digest }}"
-            sudo docker run -d -p 80:5000 --name webapp "${{ steps.get_image_digest.outputs.digest }}"
-            sudo docker run -d -p 80:5000 --name webapp "${{ steps.get_image_digest.outputs.digest }}"
+            # Build the Docker image on the EC2 instance
+            sudo docker build -t ec2-flask:v1.0 -f /home/ec2-user/downloads/Dockerfile /home/ec2-user/downloads
+
+            # Run the newly built Docker image
+            sudo docker run -d -p 80:5000 --name webapp ec2-flask:v1.0
